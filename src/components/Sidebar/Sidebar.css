@@ -1,0 +1,166 @@
+sidebar{
+    background: var(--bg-elevated);
+    border-right: 1px solid var(--border-soft);
+    padding: 22px 18px;
+    display:flex;
+    flex-direction:column;
+    gap: 16px;
+    max-height: calc(100vh - 68px);
+    position: sticky;
+    top: 68px;
+}
+.sidebar-header{ display:flex; flex-direction:column; gap:10px; }
+.sidebar-header .form-control{
+    background: var(--surface-solid);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    padding: 9px 12px;
+}
+.sidebar-header .form-control:focus{
+    background: var(--surface-solid);
+    color: var(--text);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(47,208,255,.15);
+}
+.sidebar-header .form-control::placeholder{ color: var(--text-faint); }
+
+.vehicle-list{ overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px; }
+channel-label{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+
+.vehicle-item{
+
+    width:100%;
+    border:none;
+
+    background:#222c36;
+
+    color:white;
+
+    padding:12px;
+
+    margin-bottom:8px;
+
+    border-radius:10px;
+
+    transition:.25s;
+
+    text-align:left;
+
+    cursor:pointer;
+
+}
+
+.vehicle-item:hover{
+
+    background:#2f3b48;
+
+}
+
+.vehicle-item.active{
+
+    background:#198754;
+
+    font-weight:600;
+
+    transform:translateX(4px);
+
+}
+
+.vehicle-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-weight:600;
+
+}
+
+.vehicle-speed{
+
+    margin-top:6px;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    color:#37d67a;
+
+}
+
+.vehicle-time{
+
+    font-size:12px;
+
+    opacity:.6;
+
+}
+
+.vehicle-status{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+}
+
+.vehicle-status.online{
+
+    background:#20c997;
+
+    box-shadow:0 0 8px #20c997;
+
+}
+
+.vehicle-item{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    width:100%;
+
+    margin-bottom:8px;
+
+    padding:10px 14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#1f2937;
+
+    color:white;
+
+    transition:.25s;
+
+    cursor:pointer;
+
+}
+
+.vehicle-item:hover{
+
+    background:#334155;
+
+}
+
+.vehicle-item.active{
+
+    background:#0d6efd;
+
+}
