@@ -1,57 +1,45 @@
-import { useEffect } from "react";
-
 import {
     MapContainer,
     TileLayer,
-    Marker,
     Popup,
     Polyline,
+    Circle,
+    ScaleControl,
+    LayersControl,
     useMap
 } from "react-leaflet";
 
+
+import greenCar from "../../assets/icons/green-car.png";
+import yellowCar from "../../assets/icons/yellow-car.png";
+import redCar from "../../assets/icons/red-car.png";
+import grayCar from "../../assets/icons/gray-car.png";
+import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+import SmoothMarker from "./SmoothMarker";
+
 import { useVehicle } from "../../context/VehicleContext";
 import { getVehicleStatus } from "../../utils/vehicleStatus";
-
-// =============================
+import { useRef } from "react";
+// =====================================
 // Icons
-// =============================
+// =====================================
 
-const icons = {
+const carIcons = {
 
-    ONLINE: new L.Icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    }),
+    ONLINE: greenCar,
 
-    WARNING: new L.Icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    }),
+    WARNING: yellowCar,
 
-    CRITICAL: new L.Icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    }),
+    CRITICAL: redCar,
 
-    OFFLINE: new L.Icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    })
+    OFFLINE: grayCar
 
 };
 
-// =============================
+// =====================================
 
 function FlyToVehicle({ vehicle }) {
 
@@ -71,156 +59,324 @@ function FlyToVehicle({ vehicle }) {
                 Number(vehicle.latitude),
                 Number(vehicle.longitude)
             ],
-            map.getZoom(),
+            13,
             {
-                duration: 1
+                duration: 1.2
             }
         );
 
-    }, [
-        vehicle?.latitude,
-        vehicle?.longitude,
-        map
-    ]);
+    }, [vehicle, map]);
 
     return null;
+
 }
 
-// =============================
+// =====================================
 
 function MapPanel() {
+    const mapWrapperRef = useRef(null);
+    const { BaseLayer } = LayersControl;
+const toggleFullscreen = () => {
 
+    if (!document.fullscreenElement) {
+
+        mapWrapperRef.current.requestFullscreen();
+
+    } else {
+
+        document.exitFullscreen();
+
+    }
+
+};
     const {
-        vehicles,
-        selectedVehicle,
-        tracks
-    } = useVehicle();
 
-    const selectedTrack =
-        selectedVehicle
-            ? tracks[selectedVehicle.vehicleID] || []
-            : [];
+        vehicles,
+
+        selectedVehicle,
+
+        tracks
+
+    } = useVehicle();
 
     return (
 
         <section className="panel">
 
             <div className="panel-header">
+
                 Fleet Map
+
             </div>
 
             <div
-                className="panel-body"
-                style={{ height: 500 }}
-            >
-
+    ref={mapWrapperRef}
+    className="panel-body"
+    style={{
+        height: 500,
+        position: "relative"
+    }}
+>
+<button
+    onClick={toggleFullscreen}
+    style={{
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 1000,
+        border: "none",
+        background: "#0d6efd",
+        color: "white",
+        padding: "8px 12px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        fontWeight: "bold"
+    }}
+>
+    ⛶ Full Screen
+</button>
                 <MapContainer
+
                     center={[30.0444, 31.2357]}
+
                     zoom={7}
+
                     style={{
-                        width: "100%",
-                        height: "100%"
+                        height: "100%",
+                        width: "100%"
                     }}
+
                 >
 
-                    <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
+                    <LayersControl position="topright">
 
-                    <FlyToVehicle vehicle={selectedVehicle} />
+    <BaseLayer checked name="OpenStreetMap">
 
-                    {/* Vehicle Track */}
-                     {selectedVehicle &&
-    tracks[selectedVehicle.vehicleID] &&
-    tracks[selectedVehicle.vehicleID].length > 1 && (
-
-        <Polyline
-            key={
-                selectedVehicle.vehicleID +
-                "-" +
-                tracks[selectedVehicle.vehicleID].length
-            }
-            positions={[...tracks[selectedVehicle.vehicleID]]}
-            pathOptions={{
-                color: "#00bfff",
-                weight: 5,
-                opacity: 1
-            }}
+        <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="© OpenStreetMap"
         />
 
-)}
-                    {selectedTrack.length > 1 && (
+    </BaseLayer>
 
-                        <Polyline
-                            positions={selectedTrack}
-                            pathOptions={{
-                                color: "#00bfff",
-                                weight: 5,
-                                opacity: 1
-                            }}
-                        />
-                       
-                    )}
+    <BaseLayer name="Satellite">
 
-                    {/* Vehicle Markers */}
+        <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles © Esri"
+        />
 
-                    {vehicles.map(vehicle => {
+    </BaseLayer>
 
-                        const { status } =
-                            getVehicleStatus(vehicle);
+    <BaseLayer name="Terrain">
 
-                        return (
+        <TileLayer
+            url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+            attribution="© OpenTopoMap"
+        />
 
-                            <Marker
-                                key={vehicle.vehicleID}
-                                position={[
-                                    Number(vehicle.latitude),
-                                    Number(vehicle.longitude)
-                                ]}
-                                icon={icons[status]}
-                            >
+    </BaseLayer>
 
-                                <Popup>
+    <BaseLayer name="Dark">
 
-                                    <strong>
-                                        {vehicle.vehicleID}
-                                    </strong>
+        <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            attribution="© CARTO"
+        />
 
-                                    <br />
+    </BaseLayer>
 
-                                    Status: {status}
+</LayersControl>
 
-                                    <br />
+            
 
-                                    Speed: {vehicle.speed} km/h
+                    <ScaleControl
+                        position="bottomleft"
+                        imperial={false}
+                    />
 
-                                    <br />
+                    <FlyToVehicle
+                        vehicle={selectedVehicle}
+                    />
 
-                                    RPM: {vehicle.rpm}
+                    {
 
-                                    <br />
+                        vehicles.map(vehicle => {
 
-                                    Fuel: {vehicle.fuelLevel?.toFixed(1)} %
+                            const { status } =
+                                getVehicleStatus(vehicle);
 
-                                    <br />
+                            const isSelected =
+                                selectedVehicle?.vehicleID ===
+                                vehicle.vehicleID;
 
-                                    Engine Temp: {vehicle.engineTemperature} °C
+                            const track =
+                                tracks?.[vehicle.vehicleID] || [];
 
-                                    <br />
+                            const markerIcon = L.icon({
 
-                                    Gear: {vehicle.gear}
+    iconUrl: carIcons[status],
 
-                                    <br />
+    iconSize:
+        isSelected
+            ? [48, 48]
+            : [38, 38],
 
-                                    GPS: {vehicle.gpsStatus}
+    iconAnchor:
+        isSelected
+            ? [24, 24]
+            : [19, 19]
 
-                                </Popup>
+});
+const gpsRadius =
+    vehicle.gpsAccuracy ??
+    (vehicle.gpsStatus === "FIX"
+        ? 8
+        : vehicle.gpsStatus === "SEARCHING"
+        ? 25
+        : 40);
+                            return (
 
-                            </Marker>
+                                <div
+                                    key={vehicle.vehicleID}
+                                >
 
-                        );
+                                    {
 
-                    })}
+                                        isSelected &&
+                                        track.length > 1 && (
+
+                                            <Polyline
+
+                                                positions={track}
+
+                                                pathOptions={{
+
+                                                    color: "#00bfff",
+
+                                                    weight: 5,
+
+                                                    opacity: 0.9
+
+                                                }}
+
+                                            />
+
+                                        )
+
+                                    }
+
+                                    <SmoothMarker
+
+                                        position={[
+
+                                            Number(vehicle.latitude),
+
+                                            Number(vehicle.longitude)
+
+                                        ]}
+
+                                        icon={markerIcon}
+
+                                    >
+
+                                                                            <Popup
+                                            minWidth={220}
+                                        >
+
+                                            <div
+                                                style={{
+                                                    minWidth: 210
+                                                }}
+                                            >
+
+                                                <h5>
+                                                    🚗 {vehicle.vehicleID}
+                                                </h5>
+
+                                                <hr />
+
+                                                <p>
+                                                    <b>Status:</b> {status}
+                                                </p>
+
+                                                <p>
+                                                    <b>Speed:</b> {vehicle.speed} km/h
+                                                </p>
+
+                                                <p>
+                                                    <b>RPM:</b> {vehicle.rpm}
+                                                </p>
+
+                                                <p>
+                                                    <b>Fuel:</b> {(vehicle.fuelLevel ?? 0).toFixed(1)} %
+                                                </p>
+
+                                                <p>
+                                                    <b>Engine Temp:</b> {vehicle.engineTemperature} °C
+                                                </p>
+
+                                                <p>
+                                                    <b>Gear:</b> {vehicle.gear}
+                                                </p>
+
+                                                <p>
+                                                    <b>Trip:</b> {vehicle.tripDistance} km
+                                                </p>
+
+                                                <p>
+                                                    <b>GPS:</b> {vehicle.gpsStatus}
+                                                </p>
+
+                                                <p>
+                                                    <b>Latitude:</b> {vehicle.latitude}
+                                                </p>
+
+                                                <p>
+                                                    <b>Longitude:</b> {vehicle.longitude}
+                                                </p>
+
+                                            </div>
+
+                                        </Popup>
+
+                                    </SmoothMarker>
+                                <Circle
+    center={[
+        Number(vehicle.latitude),
+        Number(vehicle.longitude)
+    ]}
+    radius={gpsRadius}
+    pathOptions={{
+        color:
+            status === "ONLINE"
+                ? "#00ff88"
+                : status === "WARNING"
+                ? "#ffd43b"
+                : status === "CRITICAL"
+                ? "#ff4444"
+                : "#888",
+
+        fillColor:
+            status === "ONLINE"
+                ? "#00ff88"
+                : status === "WARNING"
+                ? "#ffd43b"
+                : status === "CRITICAL"
+                ? "#ff4444"
+                : "#888",
+
+        fillOpacity: 0.15,
+        weight: 2
+    }}
+/>
+                                </div>
+
+                            );
+
+                        })
+
+                    }
 
                 </MapContainer>
 

@@ -1,150 +1,102 @@
-import StatCard from "../Common/StatCard";
+import { useState } from "react";
+
 import { useVehicle } from "../../context/VehicleContext";
 import { getVehicleStatus } from "../../utils/vehicleStatus";
+
 import { exportVehiclePDF } from "../../reports/exportPDF";
+
+import VehicleDetailsModal from "./VehicleDetailsModal";
 
 function SelectedVehicle() {
 
     const { selectedVehicle } = useVehicle();
 
-    if (!selectedVehicle) {
-        return (
-            <section className="panel">
-                <div className="panel-header">
-                    Selected Vehicle
-                </div>
+    const [open,setOpen]=useState(false);
 
-                <div className="panel-body">
-                    No Vehicle Selected
-                </div>
-            </section>
-        );
+    if(!selectedVehicle){
+
+        return null;
+
     }
 
-    const vehicleStatus = getVehicleStatus(selectedVehicle);
+    const {status}=getVehicleStatus(selectedVehicle);
 
-    return (
+    return(
+
+        <>
 
         <section className="panel">
 
             <div className="panel-header">
+
                 Selected Vehicle
+
             </div>
 
-            <div className="panel-body">
+            <div
+                className="panel-body"
+                style={{
+                    textAlign:"center",
+                    padding:"45px"
+                }}
+            >
 
-                <div className="vehicle-id-block">
+                <h1>
 
-                    <h2>{selectedVehicle.vehicleID}</h2>
+                    {selectedVehicle.vehicleID}
 
-                    <span
-                        className={`badge bg-${vehicleStatus.status.toLowerCase()}`}
-                    >
-                        {vehicleStatus.status}
-                    </span>
+                </h1>
 
-                </div>
-
-                {/* زر التصدير */}
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        marginBottom: "20px"
-                    }}
+                <span
+                    className={`badge bg-${status.toLowerCase()}`}
                 >
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => exportVehiclePDF(selectedVehicle)}
-                    >
-                        📄 Export PDF
-                    </button>
-                </div>
 
-                <div className="vehicle-stats-grid">
+                    {status}
 
-                    <StatCard
-                        title="Speed"
-                        value={`${selectedVehicle.speed ?? 0} km/h`}
-                    />
+                </span>
 
-                    <StatCard
-                        title="RPM"
-                        value={selectedVehicle.rpm ?? 0}
-                    />
+                <br/><br/>
 
-                    <StatCard
-                        title="Fuel Level"
-                        value={`${(selectedVehicle.fuelLevel ?? 0).toFixed(1)} %`}
-                    />
+                <button
+                    className="btn btn-primary"
+                    onClick={()=>setOpen(true)}
+                >
 
-                    <StatCard
-                        title="Fuel Consumption"
-                        value={`${selectedVehicle.fuelConsumption ?? 0} L/100km`}
-                    />
+                    View Details
 
-                    <StatCard
-                        title="Engine Temp"
-                        value={`${selectedVehicle.engineTemperature ?? 0} °C`}
-                    />
+                </button>
 
-                    <StatCard
-                        title="Coolant Temp"
-                        value={`${selectedVehicle.coolantTemperature ?? 0} °C`}
-                    />
+                {"  "}
 
-                    <StatCard
-                        title="Oil Pressure"
-                        value={`${selectedVehicle.oilPressure ?? 0} bar`}
-                    />
+                <button
+                    className="btn btn-success"
+                    onClick={()=>
+                        exportVehiclePDF(selectedVehicle)
+                    }
+                >
 
-                    <StatCard
-                        title="Engine Load"
-                        value={`${selectedVehicle.engineLoad ?? 0} %`}
-                    />
+                    Export PDF
 
-                    <StatCard
-                        title="Throttle"
-                        value={`${selectedVehicle.throttlePosition ?? 0} %`}
-                    />
-
-                    <StatCard
-                        title="Gear"
-                        value={selectedVehicle.gear ?? "-"}
-                    />
-
-                    <StatCard
-                        title="Trip"
-                        value={`${selectedVehicle.tripDistance ?? 0} km`}
-                    />
-
-                    <StatCard
-                        title="Odometer"
-                        value={`${selectedVehicle.odometer ?? 0} km`}
-                    />
-
-                    <StatCard
-                        title="Latitude"
-                        value={selectedVehicle.latitude ?? "--"}
-                    />
-
-                    <StatCard
-                        title="Longitude"
-                        value={selectedVehicle.longitude ?? "--"}
-                    />
-
-                    <StatCard
-                        title="GPS"
-                        value={selectedVehicle.gpsStatus ?? "--"}
-                    />
-
-                </div>
+                </button>
 
             </div>
 
         </section>
 
+        <VehicleDetailsModal
+
+            vehicle={selectedVehicle}
+
+            open={open}
+
+            onClose={()=>setOpen(false)}
+
+        />
+
+        </>
+
     );
+
 }
 
 export default SelectedVehicle;

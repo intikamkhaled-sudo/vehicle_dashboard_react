@@ -14,51 +14,71 @@ import "leaflet/dist/leaflet.css";
 import { useVehicle } from "../../context/VehicleContext";
 import { getVehicleStatus } from "../../utils/vehicleStatus";
 
-// =============================
+// =====================================
 // Icons
-// =============================
+// =====================================
 
 const icons = {
 
     ONLINE: new L.Icon({
+
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+
         shadowUrl:
             "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
         iconSize: [25, 41],
+
         iconAnchor: [12, 41]
+
     }),
 
     WARNING: new L.Icon({
+
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png",
+
         shadowUrl:
             "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
         iconSize: [25, 41],
+
         iconAnchor: [12, 41]
+
     }),
 
     CRITICAL: new L.Icon({
+
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+
         shadowUrl:
             "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
         iconSize: [25, 41],
+
         iconAnchor: [12, 41]
+
     }),
 
     OFFLINE: new L.Icon({
+
         iconUrl:
             "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
+
         shadowUrl:
             "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
         iconSize: [25, 41],
+
         iconAnchor: [12, 41]
+
     })
 
 };
 
-// =============================
+// =====================================
 
 function FlyToVehicle({ vehicle }) {
 
@@ -74,29 +94,38 @@ function FlyToVehicle({ vehicle }) {
         ) return;
 
         map.flyTo(
+
             [
-                vehicle.latitude,
-                vehicle.longitude
+                Number(vehicle.latitude),
+                Number(vehicle.longitude)
             ],
+
             13,
+
             {
-                duration: 1.5
+                duration: 1.2
             }
+
         );
 
     }, [vehicle, map]);
 
     return null;
+
 }
 
-// =============================
+// =====================================
 
 function MapPanel() {
 
     const {
+
         vehicles,
+
         selectedVehicle,
+
         tracks
+
     } = useVehicle();
 
     return (
@@ -121,14 +150,19 @@ function MapPanel() {
                     zoom={7}
 
                     style={{
+
                         height: "100%",
+
                         width: "100%"
+
                     }}
 
                 >
 
                     <TileLayer
+
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+
                     />
 
                     <FlyToVehicle vehicle={selectedVehicle} />
@@ -140,38 +174,56 @@ function MapPanel() {
                             const { status } =
                                 getVehicleStatus(vehicle);
 
+                            const isSelected =
+                                selectedVehicle?.vehicleID === vehicle.vehicleID;
+
                             const track =
                                 tracks?.[vehicle.vehicleID] || [];
-if (track.length > 0) {
-    console.table(track);
-}
-const selectedTrack =
-    selectedVehicle
-        ? tracks[selectedVehicle.vehicleID]
-        : [];
 
-console.log("TRACKS =", tracks);
-console.log("SELECTED TRACK =", selectedTrack);
+                            const markerIcon = L.icon({
+
+                                iconUrl:
+                                    icons[status].options.iconUrl,
+
+                                shadowUrl:
+                                    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
+                                iconSize:
+                                    isSelected
+                                        ? [35, 55]
+                                        : [25, 41],
+
+                                iconAnchor:
+                                    isSelected
+                                        ? [17, 55]
+                                        : [12, 41],
+
+                                popupAnchor:
+                                    [0, -40]
+
+                            });
+
                             return (
 
                                 <div key={vehicle.vehicleID}>
 
                                     {
 
+                                        isSelected &&
+
                                         track.length > 1 && (
 
                                             <Polyline
-                                            
+
                                                 positions={track}
-                                            
+
                                                 pathOptions={{
 
-                                                    color:
-                                                        selectedVehicle?.vehicleID === vehicle.vehicleID
-                                                            ? "#00bfff"
-                                                            : "#00ff88",
+                                                    color: "#00bfff",
 
-                                                    weight: 4
+                                                    weight: 5,
+
+                                                    opacity: 0.9
 
                                                 }}
 
@@ -184,49 +236,94 @@ console.log("SELECTED TRACK =", selectedTrack);
                                     <Marker
 
                                         position={[
-                                            vehicle.latitude,
-                                            vehicle.longitude
+
+                                            Number(vehicle.latitude),
+
+                                            Number(vehicle.longitude)
+
                                         ]}
 
-                                        icon={icons[status]}
+                                        icon={markerIcon}
 
                                     >
 
-                                        <Popup>
+                                        <Popup minWidth={220}>
 
-                                            <h6>
+                                            <div
+                                                style={{
+                                                    minWidth: 210
+                                                }}
+                                            >
 
-                                                {vehicle.vehicleID}
+                                                <h5>
 
-                                            </h6>
+                                                    🚗 {vehicle.vehicleID}
 
-                                            <hr />
+                                                </h5>
 
-                                            <b>Status:</b> {status}
+                                                <hr />
 
-                                            <br />
+                                                <p>
 
-                                            <b>Speed:</b> {vehicle.speed} km/h
+                                                    <b>Status :</b> {status}
 
-                                            <br />
+                                                </p>
 
-                                            <b>RPM:</b> {vehicle.rpm}
+                                                <p>
 
-                                            <br />
+                                                    <b>Speed :</b> {vehicle.speed} km/h
 
-                                            <b>Fuel:</b> {vehicle.fuelLevel?.toFixed(1)} %
+                                                </p>
 
-                                            <br />
+                                                <p>
 
-                                            <b>Engine Temp:</b> {vehicle.engineTemperature} °C
+                                                    <b>RPM :</b> {vehicle.rpm}
 
-                                            <br />
+                                                </p>
 
-                                            <b>Gear:</b> {vehicle.gear}
+                                                <p>
 
-                                            <br />
+                                                    <b>Fuel :</b> {vehicle.fuelLevel?.toFixed(1)} %
 
-                                            <b>GPS:</b> {vehicle.gpsStatus}
+                                                </p>
+
+                                                <p>
+
+                                                    <b>Engine Temp :</b> {vehicle.engineTemperature} °C
+
+                                                </p>
+
+                                                <p>
+
+                                                    <b>Gear :</b> {vehicle.gear}
+
+                                                </p>
+
+                                                <p>
+
+                                                    <b>GPS :</b> {vehicle.gpsStatus}
+
+                                                </p>
+
+                                                <hr />
+
+                                                <button
+
+                                                    className="btn btn-primary"
+
+                                                    style={{
+
+                                                        width: "100%"
+
+                                                    }}
+
+                                                >
+
+                                                    Focus Vehicle
+
+                                                </button>
+
+                                            </div>
 
                                         </Popup>
 

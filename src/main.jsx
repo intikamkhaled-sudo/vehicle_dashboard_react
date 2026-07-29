@@ -7,13 +7,22 @@ import { VehicleProvider } from "./context/VehicleContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "leaflet/dist/leaflet.css";
-
+import { NotificationProvider } from "./context/NotificationContext";
 import "./styles/dashboard.css";
-
+import { ReplayProvider } from "./context/ReplayContext";
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <React.StrictMode>
-        <VehicleProvider>
+
+    <NotificationProvider>
+
+    <VehicleProvider>
+
+        <ReplayProvider>
+
             <App />
-        </VehicleProvider>
-    </React.StrictMode>
+
+        </ReplayProvider>
+
+    </VehicleProvider>
+
+</NotificationProvider>
 );

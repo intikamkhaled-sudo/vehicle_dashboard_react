@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useVehicle } from "../../context/VehicleContext";
+import NotificationBell from "../Notifications/NotificationBell";
 
 function Topbar() {
 
@@ -8,16 +9,12 @@ function Topbar() {
         socketConnected
     } = useVehicle();
 
-    const [time, setTime] = useState(
-        new Date()
-    );
+    const [time, setTime] = useState(new Date());
 
     useEffect(() => {
 
         const timer = setInterval(() => {
-
             setTime(new Date());
-
         }, 1000);
 
         return () => clearInterval(timer);
@@ -54,6 +51,8 @@ function Topbar() {
                 }}
             >
 
+                <NotificationBell />
+
                 <span
                     className={
                         socketConnected
@@ -67,15 +66,11 @@ function Topbar() {
                 </span>
 
                 <span className="badge bg-online">
-
                     Vehicles : {vehicles.length}
-
                 </span>
 
                 <span className="badge bg-warning-status">
-
                     {time.toLocaleTimeString()}
-
                 </span>
 
             </div>

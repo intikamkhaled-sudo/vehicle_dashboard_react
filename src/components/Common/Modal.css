@@ -1,0 +1,103 @@
+.modal-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.modal-box{
+
+    width:900px;
+
+    max-width:95%;
+
+    background:#111827;
+
+    border-radius:14px;
+
+    padding:30px;
+
+    color:white;
+
+    animation:popup .25s;
+
+}
+
+@keyframes popup{
+
+from{
+
+transform:scale(.9);
+
+opacity:0;
+
+}
+
+to{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}
+
+.modal-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:25px;
+
+}
+
+.close-btn{
+
+background:#ef4444;
+
+border:none;
+
+color:white;
+
+padding:8px 14px;
+
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+.vehicle-stats-grid{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:20px;
+
+}
+
+.vehicle-stats-grid div{
+
+background:#1f2937;
+
+padding:18px;
+
+border-radius:10px;
+
+}

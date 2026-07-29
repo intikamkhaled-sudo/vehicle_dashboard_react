@@ -4,7 +4,7 @@ import {
     useState,
     useCallback
 } from "react";
-
+import { useNotification } from "./NotificationContext";
 const VehicleContext = createContext();
 
 export function VehicleProvider({ children }) {
@@ -14,7 +14,11 @@ export function VehicleProvider({ children }) {
     const [history, setHistory] = useState([]);
     const [tracks, setTracks] = useState({});
     const [socketConnected, setSocketConnected] = useState(false);
+    const notification = useNotification();
 
+console.log(notification);
+
+const { addNotification } = notification || {};
     const updateVehicle = useCallback((packet) => {
 
         // ===============================
@@ -116,7 +120,77 @@ export function VehicleProvider({ children }) {
             return next.slice(-500);
 
         });
+        // ===============================
+// Notifications
+// ===============================
 
+// Low Fuel
+if ((packet.fuelLevel ?? 100) < 20) {
+
+    addNotification({
+
+        type: "warning",
+
+        vehicleID: packet.vehicleID,
+
+        title: "Low Fuel",
+
+        message: `Fuel Level: ${packet.fuelLevel.toFixed(1)}%`
+
+    });
+
+}
+
+// High Engine Temperature
+if ((packet.engineTemperature ?? 0) > 105) {
+
+    addNotification({
+
+        type: "critical",
+
+        vehicleID: packet.vehicleID,
+
+        title: "High Engine Temperature",
+
+        message: `${packet.engineTemperature} °C`
+
+    });
+
+}
+
+// High RPM
+if ((packet.rpm ?? 0) > 4000) {
+
+    addNotification({
+
+        type: "warning",
+
+        vehicleID: packet.vehicleID,
+
+        title: "High RPM",
+
+        message: `${packet.rpm} RPM`
+
+    });
+
+}
+
+// Overspeed
+if ((packet.speed ?? 0) > 120) {
+
+    addNotification({
+
+        type: "warning",
+
+        vehicleID: packet.vehicleID,
+
+        title: "Overspeed",
+
+        message: `${packet.speed} km/h`
+
+    });
+
+}
         // ===============================
         // Vehicle Tracks
         // ===============================

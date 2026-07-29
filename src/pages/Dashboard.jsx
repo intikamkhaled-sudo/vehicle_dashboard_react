@@ -12,7 +12,8 @@ import TelemetryTable from "../components/Table/TelemetryTable";
 import FleetAnalytics
 from "../components/Analytics/FleetAnalytics";
 import VehicleHealth from "../components/Analytics/VehicleHealth";
-
+import NotificationPanel from "../components/Notifications/NotificationPanel";
+import ReplayPanel from "../components/Replay/ReplayPanel";
 function Dashboard() {
     return (
         <DashboardLayout>
@@ -21,10 +22,13 @@ function Dashboard() {
 
             <SelectedVehicle />
 
-            <div className="grid-2col">
-                <GaugePanel />
-                <AlertsPanel />
-            </div>
+<div className="grid-2col">
+
+    <GaugePanel />
+
+    <NotificationPanel />
+
+</div>
 
             <ChartsPanel />
             
@@ -32,6 +36,7 @@ function Dashboard() {
 <FleetAnalytics />
         <VehicleHealth />
             <MapPanel />
+             <ReplayPanel />
 
             <TelemetryTable />
 
